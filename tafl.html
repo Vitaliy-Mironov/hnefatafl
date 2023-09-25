@@ -20,7 +20,7 @@
             font-size: 12pt;
             font-family: Verdana, sans-serif;
             color: #333;
-            margin: 30px 0;
+            margin: 20px 0;
         }
         h1, h2, h3 {
             text-align: center;
@@ -40,7 +40,11 @@
         p {
             font-size: 12pt;
             margin: 10px;
-            text-align: justify;
+        }
+        @media (min-width: 800px) {
+            p {
+                text-align: justify;
+            }
         }
         .p {
             margin-top: 30px;
@@ -105,7 +109,8 @@
         .comment {
             font-style: italic;
             font-size: 12px;
-            margin: 20px auto;
+            margin: 20px 20px 0 20px;
+            text-align: center;
         }
         .illustrations {
             display: flex;
@@ -121,7 +126,7 @@
             margin: 10px;
 
         }
-        /* ================ */
+        /* Стили кнопки */
         .button {
             margin-top: 30px;
             display: flex;
@@ -198,13 +203,19 @@
                 opacity: 0;
             }
         }
-        /* ################ */
+        /* Стили игрового поля */
+        .wrapper {
+            display: flex;
+            justify-content: center;
+        }
         .board {
             display: grid;
+            max-width: 95vmin;
+            max-height: 95vmin;
             grid-template-columns: repeat(11, 1fr);
             grid-template-rows: repeat(11, 1fr);
             gap: 2px;
-            margin: 10px auto;
+            place-items: center;
         }
         .cell {
             background-color: lightgray;
@@ -272,19 +283,19 @@
     </style>
 </head>
 <body>
-    <div class="board" id="game-board">
-        <div class="alert" id="game-alert">
-            <h3 class="" id="alert-text"></h3>
-            <div class="button"><a href="#" onclick="location.reload();" rel="nofollow" class="btn">Новая игра</a></div>
+    <div class="wrapper">
+        <div class="board" id="game-board">
+            <div class="alert" id="game-alert">
+                <h3 class="" id="alert-text"></h3>
+                <div class="button"><a href="#" onclick="location.reload();" rel="nofollow" class="btn">Новая игра</a></div>
+            </div>
         </div>
     </div>
     <script>
         // Игровые константы и переменные
         const board = document.getElementById('game-board');
-        var cellSize = 60;
         const rows = 11;
         const cols = 11;
-        board.style.width = (cellSize * cols) + (cols * 2 - 2) + 'px';
         var isWalkWhite = false; // ход белых (true) или чёрных (false)?
         var isWalk = false; // сейчас операция хода (true), или выбора фигуры (false)?
         var highlighted = '';
@@ -297,7 +308,7 @@
             for (let col = 0; col < cols; col++) {
                 const cell = document.createElement('div');
                 cell.className = 'cell';
-                cell.style.width = cellSize + 'px';
+                cell.style.width = 8 + 'vmin';
                 cell.style.height = cell.style.width;
                 let idName = row + '_' + col;
                 cell.setAttribute('id', idName);
@@ -322,18 +333,14 @@
             ['s', 'f', 'f', 'b', 'b', 'b', 'b', 'b', 'f', 'f', 's']
         ];
         // Тестовый массив расстановки фигур.
-        // Для создания тестовой ситуации, закомментировать предыдущий массив,
-        // раскомментировать этот и расставить фигуры как нужно для теста
-        // 'f' - пустая клетка, 'k' - Конунг, 'w' - белая фишка,
-        // 'b' - чёрная фишка,  's' - убежища (всегда в углах поля)
         /*var playfield = [
             ['s', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 's'],
             ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f'],
             ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f'],
-            ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f'],
-            ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f'],
-            ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f'],
-            ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f'],
+            ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'b', 'f', 'f'],
+            ['b', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f'],
+            ['b', 'k', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f'],
+            ['b', 'f', 'f', 'w', 'w', 'f', 'f', 'f', 'f', 'f', 'f'],
             ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f'],
             ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f'],
             ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f'],
